@@ -33,8 +33,11 @@ def read_xsection_measurement_results(category, channel):
         
     h_normalised_xsection = value_error_tuplelist_to_hist(normalised_xsection_unfolded['TTJet_measured'], bin_edges[variable])
     h_normalised_xsection_unfolded = value_error_tuplelist_to_hist(normalised_xsection_unfolded['TTJet_unfolded'], bin_edges[variable])
-    
-    
+
+    #adding MadGraph with pt reweighting
+    normalised_xsection_MADGRAPH_ptreweight = read_data_from_JSON(path_to_JSON + '/xsection_measurement_results' + '/kv' + str(k_value) + '/' 
+                                                       + 'TTJets_ptreweight' + '/normalised_xsection_' + channel + '_' + met_type + '.txt')
+
     histograms_normalised_xsection_different_generators = {'measured':h_normalised_xsection,
                                                            'unfolded':h_normalised_xsection_unfolded}
     
@@ -44,6 +47,7 @@ def read_xsection_measurement_results(category, channel):
     if category == 'central':
         # true distributions
         h_normalised_xsection_MADGRAPH = value_error_tuplelist_to_hist(normalised_xsection_unfolded['MADGRAPH'], bin_edges[variable])
+        h_normalised_xsection_MADGRAPH_ptreweight = value_error_tuplelist_to_hist(normalised_xsection_MADGRAPH_ptreweight['TTJet_unfolded'], bin_edges[variable])
         h_normalised_xsection_POWHEG = value_error_tuplelist_to_hist(normalised_xsection_unfolded['POWHEG'], bin_edges[variable])
         h_normalised_xsection_MCATNLO = value_error_tuplelist_to_hist(normalised_xsection_unfolded['MCATNLO'], bin_edges[variable])
         h_normalised_xsection_mathchingup = value_error_tuplelist_to_hist(normalised_xsection_unfolded['matchingup'], bin_edges[variable])
@@ -56,6 +60,7 @@ def read_xsection_measurement_results(category, channel):
                                                                     'MCATNLO':h_normalised_xsection_MCATNLO})
         
         histograms_normalised_xsection_systematics_shifts.update({'MADGRAPH':h_normalised_xsection_MADGRAPH,
+                                                                  'MADGRAPH_ptreweight':h_normalised_xsection_MADGRAPH_ptreweight,
                                                                   'matchingdown': h_normalised_xsection_mathchingdown,
                                                                   'matchingup': h_normalised_xsection_mathchingup,
                                                                   'scaledown': h_normalised_xsection_scaledown,
@@ -286,6 +291,9 @@ def make_plots(histograms, category, output_folder, histname, show_before_unfold
             if 'POWHEG' in key or 'matchingdown' in key:
                 hist.linestyle = 'longdashdot'
                 hist.SetLineColor(kBlue)
+            elif 'MADGRAPH_ptreweight' in key:
+                hist.linestyle = 'longdashdotdotdot'
+                hist.SetLineColor(kRed + 2)
             elif 'MADGRAPH' in key:
                 hist.linestyle = 'solid'
                 hist.SetLineColor(kRed + 1)
